@@ -9,16 +9,25 @@ on:
         default: '手动构建'
 
 jobs:
-  build-windows-and-release:
+  build-windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v6.0.1
-      - uses: subosito/flutter-action@v2.21.0
+      - name: Checkout code
+        uses: actions/checkout@v6.0.1
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2.21.0
         with:
           flutter-version: '3.38.7'
-      - run: flutter pub get
-      - run: flutter build windows --release
-      - uses: actions/download-artifact@v4
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Windows app
+        run: flutter build windows --release
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
         with:
           name: lite_view-windows
           path: build/windows/runner/Release
