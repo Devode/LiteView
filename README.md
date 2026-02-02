@@ -115,9 +115,11 @@ flutter build apk --release
 
 ## 联系方式
 
-- 项目地址: https://gitee.com/devode/lite_view
-- 问题反馈: https://gitee.com/devode/lite_view/issues
+- 项目地址: https://github.com/Devode/LiteView
+- 问题反馈: https://github.com/Devode/LiteView/issues
 
 ---
 
 *轻阅屏 - 让阅读更轻松*
+
+<small style="color: #666; opacity: 0.8;">本工具为通用 PDF 阅读器</small>
