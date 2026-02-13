@@ -1,0 +1,11 @@
+import 'package:hive/hive.dart';
+
+Future<Map<String, dynamic>> getPdfDocs() async {
+  // 打开名为 pdf_docs 的 box
+  final box = await Hive.openBox('pdf_docs');
+  // 获取 box 中 key 为 docs 的数据
+  final data = box.get('docs') as Map<String, dynamic>?;
+  print('data: ${data.toString()}');
+  // 返回数据，如果没有数据，则返回空 map
+  return data ?? <String, dynamic>{};
+}

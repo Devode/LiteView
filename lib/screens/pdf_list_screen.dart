@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:window_manager/window_manager.dart';
-import '../utils/pdf_file_scanner.dart';
+// import '../utils/pdf_file_scanner.dart';
+import '../utils/pdf_file_list_handler.dart';
 import '../utils/import_pdf.dart';
 import 'package:lite_view/utils/json_file_handler.dart';
 import 'pdf_view_page.dart';
@@ -72,6 +73,7 @@ class _PdfListScreenState extends State<PdfListScreen> {
       }
 
       try {
+        // if (!mounted) return;
         final importedFile = await importPdf(file.path);
         print(importedFile);
         if (importedFile != null) {
@@ -185,9 +187,18 @@ class _PdfListScreenState extends State<PdfListScreen> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    subtitle: Text(
-                      '修改时间：${_formatDate(modified)}',
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    subtitle: Row(
+                      children: [
+                        Text(
+                          '修改时间：${_formatDate(modified)}',
+                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '文件路径：${file.path}',
+                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        )
+                      ],
                     ),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                     onTap: () {
@@ -319,7 +330,8 @@ class _PdfListScreenState extends State<PdfListScreen> {
         //   _selectedFileIndex = null;
         // });
         _pdfDocs.remove(pdfFileNames[result]); // 从 PDF 文档字典中移除
-        jsonHandler.saveJsonToFile(_pdfDocs, 'pdfDocs.json'); // 保存到 JSON 文件
+        // jsonHandler.saveJsonToFile(_pdfDocs, 'pdfDocs.json'); // 保存到 JSON 文件
+        savePdfDocsInfo(_pdfDocs);
         _loadPdfFiles(); // 重新加载 PDF 文件
       }
     });

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:window_manager/window_manager.dart';
 import 'dart:io';
 
@@ -8,7 +10,16 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   if (Platform.isWindows) {
+    Directory path;
+    if (Platform.isAndroid) {
+      path = await getExternalStorageDirectory() ?? await getApplicationSupportDirectory();
+    }
+    else {
+      path = await getApplicationSupportDirectory();
+    }
+    print(path.path);
     await windowManager.ensureInitialized();
+    Hive.init(path.path);
     windowManager.setTitle('轻阅屏');
   }
 
