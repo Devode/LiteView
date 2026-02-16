@@ -1,0 +1,105 @@
+{
+  "appTitle": "轻阅屏",
+  "appName": "轻阅屏",
+  "about": "关于",
+
+  "legaleseLicense": "本软件为开源软件，采用 MIT 许可证。",
+  "description": "一个轻量、离线、无广告的 PDF 阅读器。",
+
+  "removePdfTitle": "移除 PDF 文件",
+  "removePdfPrompt": "选择要移除的 PDF 文件",
+  "removePdfNote": "（仅在列表中移除，不会从设备中删除文件）",
+  "removePdfWarn": "请选择要移除的 PDF 文件",
+
+  "modificationTime": "修改时间：{Date}",
+  "@modificationTime": {
+    "description": "修改时间",
+    "placeholders": {
+      "Date": {
+        "type": "String",
+        "example": "2026-01-01 00:00:00"
+      }
+    }
+  },
+  "filePath": "文件路径：{Path}",
+  "@filePath": {
+    "description": "文件路径",
+    "placeholders": {
+      "Path": {
+        "type": "String"
+      }
+    }
+  },
+
+  "emptyPdfListText": "暂无 PDF 文档",
+  "importPDF": "导入 PDF 文件",
+  "removePDF": "移除 PDF 文件",
+
+  "pdfReader": "PDF 阅读器",
+  "menuButton": "菜单",
+  "panMode": "平移模式",
+  "annotationMode": "批注模式",
+  "eraserMode": "橡皮擦模式",
+  "clearButton": "清空",
+  "fitToPageButton": "自适应",
+  "zoomInButton": "放大",
+  "zoomOutButton": "缩小",
+  "settingsButton": "设置",
+  "previousPageButton": "上一页",
+  "page": "页数",
+  "nextPageButton": "下一页",
+
+  "buttonScale": "按钮缩放：{Scale}",
+  "@buttonScale": {
+    "description": "按钮缩放",
+    "placeholders": {
+      "Scale": {
+        "type": "String"
+      }
+    }
+  },
+  "strokeWidth": "画笔粗细：{Width}",
+  "@strokeWidth": {
+    "description": "画笔粗细",
+    "placeholders": {
+      "Width": {
+        "type": "String"
+      }
+    }
+  },
+  "brushColor": "画笔颜色",
+
+  "selectBrushColorTitle": "选择画笔颜色",
+
+  "goToPageTitle": "跳转到页码",
+  "goToPageInputTip": "输入页码",
+  "goToPageInputError": "请输入有效的页码",
+
+  "loadPdfFailed": "加载 PDF 文件失败：{Error}",
+  "@loadPdfFailed": {
+    "description": "加载 PDF 文件失败",
+    "placeholders": {
+      "Error": {
+        "type": "String"
+      }
+    }
+  },
+  "navigationAtLastPage": "已在最后一页，返回第一页",
+  "navigationAtFirstPage": "已在第一页，跳转到最后一页",
+  "somethingWentWrong": "发生错误：{Error}",
+  "@somethingWentWrong": {
+    "description": "发生错误",
+    "placeholders": {
+      "Error": {
+        "type": "String"
+      }
+    }
+  },
+
+  "tip": "提示",
+  "cancel": "取消",
+  "remove": "移除",
+  "ok": "确定",
+  "error": "错误",
+  "more": "更多"
+}

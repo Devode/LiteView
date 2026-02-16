@@ -1,0 +1,95 @@
+{
+  "appTitle": "LiteView",
+  "appName": "LiteView",
+  "about": "About",
+  "legaleseLicense": "This software is open source and licensed under the MIT License.",
+  "description": "A lite, offline and ad-free PDF reader.",
+  "removePdfTitle": "Remove PDF",
+  "removePdfPrompt": "Select a PDF file to remove",
+  "removePdfNote": "(Only removed from the list, not deleted from your device.)",
+  "removePdfWarn": "Please select a PDF file to remove.",
+  "modificationTime": "Modified: {Date}",
+  "@modificationTime": {
+    "description": "修改时间",
+    "placeholders": {
+      "Date": {
+        "type": "String",
+        "example": "2026-01-01 00:00:00"
+      }
+    }
+  },
+  "filePath": "Path: {Path}",
+  "@filePath": {
+    "description": "文件路径",
+    "placeholders": {
+      "Path": {
+        "type": "String"
+      }
+    }
+  },
+  "emptyPdfListText": "No PDFs yet.",
+  "importPDF": "Import PDF",
+  "removePDF": "Remove PDF",
+  "pdfReader": "PDF Reader",
+  "menuButton": "Menu",
+  "panMode": "Pan Mode",
+  "annotationMode": "Annotation Mode",
+  "eraserMode": "Eraser Mode",
+  "clearButton": "Clear",
+  "fitToPageButton": "Fit To Page",
+  "zoomInButton": "Zoom In",
+  "zoomOutButton": "Zoom Out",
+  "settingsButton": "Settings",
+  "previousPageButton": "Previous Page",
+  "page": "Page",
+  "nextPageButton": "Next Page",
+  "buttonScale": "Button Scale: {Scale}",
+  "@buttonScale": {
+    "description": "按钮缩放",
+    "placeholders": {
+      "Scale": {
+        "type": "String"
+      }
+    }
+  },
+  "strokeWidth": "Stroke Width: {Width}",
+  "@strokeWidth": {
+    "description": "画笔粗细",
+    "placeholders": {
+      "Width": {
+        "type": "String"
+      }
+    }
+  },
+  "brushColor": "Brush Color",
+  "selectBrushColorTitle": "Select Brush Color",
+  "goToPageTitle": "Go to page",
+  "goToPageInputTip": "Input page number",
+  "goToPageInputError": "Please input valid page number",
+  "loadPdfFailed": "Load PDF failed: {Error}",
+  "@loadPdfFailed": {
+    "description": "加载 PDF 文件失败",
+    "placeholders": {
+      "Error": {
+        "type": "String"
+      }
+    }
+  },
+  "navigationAtLastPage": "Already at the last page, jumped to the first page.",
+  "navigationAtFirstPage": "Already at the first page, jumped to the last page.",
+  "somethingWentWrong": "Something went wrong: {Error}",
+  "@somethingWentWrong": {
+    "description": "发生错误",
+    "placeholders": {
+      "Error": {
+        "type": "String"
+      }
+    }
+  },
+  "tip": "Tip",
+  "cancel": "Cancel",
+  "remove": "Remove",
+  "ok": "OK",
+  "error": "Error",
+  "more": "More"
+}
