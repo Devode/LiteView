@@ -10,20 +10,17 @@ import 'l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Directory path;
 
-  if (Platform.isWindows) {
-    Directory path;
-    if (Platform.isAndroid) {
-      path = await getExternalStorageDirectory() ?? await getApplicationSupportDirectory();
-    }
-    else {
-      path = await getApplicationSupportDirectory();
-    }
+  if (Platform.isAndroid) {
+    path = await getExternalStorageDirectory() ?? await getApplicationSupportDirectory();
+  } else {
+    path = await getApplicationSupportDirectory();
     print(path.path);
     await windowManager.ensureInitialized();
-    Hive.init(path.path);
-
   }
+
+  Hive.init(path.path);
 
   runApp(const MainApp());
 }
