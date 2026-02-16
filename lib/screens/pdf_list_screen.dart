@@ -7,6 +7,7 @@ import '../utils/pdf_file_list_handler.dart';
 import '../utils/import_pdf.dart';
 import 'package:lite_view/utils/json_file_handler.dart';
 import 'pdf_view_page.dart';
+import 'package:lite_view/l10n/app_localizations.dart';
 
 class PdfListScreen extends StatefulWidget {
   const PdfListScreen({super.key});
@@ -27,8 +28,11 @@ class _PdfListScreenState extends State<PdfListScreen> {
   @override
   void initState() {
     super.initState();
-    windowManager.setTitle("轻阅屏");
+    // windowManager.setTitle("轻阅屏");
     _loadPdfFiles();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      windowManager.setTitle(AppLocalizations.of(context)!.appName);
+    });
   }
 
   void _loadPdfFiles() {
@@ -145,7 +149,44 @@ class _PdfListScreenState extends State<PdfListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("PDF 文档列表"),
+        title: Text(AppLocalizations.of(context)!.appTitle),
+        actions: [
+          PopupMenuButton(
+            icon: const Icon(Icons.more_vert),
+            tooltip: AppLocalizations.of(context)!.more,
+            onSelected: (String result) {
+              // 处理选中项
+              if (result == 'about') {
+                showAboutDialog(
+                  context: context,
+                  applicationName: AppLocalizations.of(context)!.appName,
+                  applicationVersion: '1.0.0',
+                  applicationIcon: Image.asset('assets/icon/app_icon.png', width: 64, height: 64),
+                  applicationLegalese: 'Copyright © 2026. Devode.\n'
+                      '${AppLocalizations.of(context)!.legaleseLicense}',
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8),
+                      child: Text(AppLocalizations.of(context)!.description),
+                    )
+                  ]
+                );
+              }
+            },
+            itemBuilder: (BuildContext context) => [
+              PopupMenuItem(
+                value: 'about',
+                child: Row(
+                  children: [
+                    const Icon(Icons.info_outline),
+                    const SizedBox(width: 8),
+                    Text(AppLocalizations.of(context)!.about),
+                  ],
+                )
+              ),
+            ],
+          )
+        ],
         elevation: 4,
         shadowColor: Colors.black,
         // backgroundColor: Colors.pinkAccent,
@@ -159,9 +200,9 @@ class _PdfListScreenState extends State<PdfListScreen> {
           } else if (snapshot.hasError) {
             return Center(child: Text('加载失败：${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
+            return Center( // 无文件
               child: Text(
-                '暂无 PDF 文档\n请将 PDF 文件放入应用文档目录',
+                AppLocalizations.of(context)!.emptyPdfListText,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey),
               ),
@@ -190,12 +231,12 @@ class _PdfListScreenState extends State<PdfListScreen> {
                     subtitle: Row(
                       children: [
                         Text(
-                          '修改时间：${_formatDate(modified)}',
+                          AppLocalizations.of(context)!.modificationTime(_formatDate(modified)),
                           style: const TextStyle(fontSize: 12, color: Colors.grey),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 16),
                         Text(
-                          '文件路径：${file.path}',
+                          AppLocalizations.of(context)!.filePath(file.path),
                           style: const TextStyle(fontSize: 12, color: Colors.grey),
                         )
                       ],
@@ -221,10 +262,12 @@ class _PdfListScreenState extends State<PdfListScreen> {
         spacing: 8,
         children: [
           FloatingActionButton(
+            tooltip: AppLocalizations.of(context)!.importPDF,
             onPressed: _pickAndImportPdf,
             child: const Icon(Icons.upload_file),
           ),
           FloatingActionButton(
+            tooltip: AppLocalizations.of(context)!.removePDF,
             onPressed: _showDeleteWindow,
             child: Icon(Icons.playlist_remove),
           )
@@ -247,7 +290,7 @@ class _PdfListScreenState extends State<PdfListScreen> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text('移除 PDF 文件'),
+              title: Text(AppLocalizations.of(context)!.removePdfTitle),
               content: SizedBox(
                 width: double.maxFinite,
                 height: double.maxFinite,
@@ -256,13 +299,13 @@ class _PdfListScreenState extends State<PdfListScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      '选择要移除的 PDF 文件',
+                      AppLocalizations.of(context)!.removePdfPrompt,
                       style: TextStyle(
                         fontSize: 16,
                       ),
                     ),
                     Text(
-                      "（仅在列表中移除，不会从设备中删除文件）",
+                      AppLocalizations.of(context)!.removePdfNote,
                       style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey
@@ -301,19 +344,33 @@ class _PdfListScreenState extends State<PdfListScreen> {
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: const Text('取消'),
+                  child: Text(AppLocalizations.of(context)!.cancel), // 取消
                 ),
                 TextButton(
-                  child: const Text('移除'),
+                  child: Text(AppLocalizations.of(context)!.remove), // 移除
                   onPressed: () {
                     if (selectedFileIndex != null) {
                       Navigator.pop(context, selectedFileIndex);
                     } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('请选择要移除的 PDF 文件'),
-                        ),
+                      showDialog( // 提示
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          content: Text(AppLocalizations.of(context)!.removePdfWarn),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text(AppLocalizations.of(context)!.ok),
+                            )
+                          ]
+                        )
                       );
+                      // ScaffoldMessenger.of(context).showSnackBar(
+                      //   SnackBar(
+                      //     content: Text(AppLocalizations.of(context)!.removePdfWarn),
+                      //   ),
+                      // );
                     }
                   },
                 ),

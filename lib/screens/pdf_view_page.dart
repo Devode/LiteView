@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:lite_view/l10n/app_localizations.dart';
 import 'package:pdfrx/pdfrx.dart';
 import 'package:lite_view/icons/my_icons.dart';
 import 'package:window_manager/window_manager.dart';
@@ -31,13 +32,14 @@ class PdfViewerPage extends StatefulWidget {
 
 class _PdfViewerPageState extends State<PdfViewerPage> {
   final Map<int, List<DrawingPath>> _pagePaths = {};
-  final AppBar appBar = AppBar(
-    title: Text('PDF 阅读器'),
-  );
   final Key _canvasKey = GlobalKey();
   final GlobalKey<CurrentPathPainterState> _currentPathPainterKey = GlobalKey();
 
+  late final AppBar appBar = AppBar(
+    title: Text(AppLocalizations.of(context)!.pdfReader),
+  );
   late PdfViewerController _controller;
+  late String appName; // 上一个页面窗口标题
 
   int currentPage = 1;
   int totalPages = 1;
@@ -67,7 +69,11 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
     ]);
 
     if (Platform.isWindows || Platform.isLinux) {
-      windowManager.setTitle('PDF 阅读器');
+      // windowManager.setTitle('PDF 阅读器');
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        windowManager.setTitle(AppLocalizations.of(context)!.pdfReader);
+        appName = AppLocalizations.of(context)!.appName;
+      });
       windowManager.maximize();
     } else if (Platform.isAndroid)
     {
@@ -99,7 +105,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('加载 PDF 失败: $e')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.loadPdfFailed(e.toString()))),
       );
     }
   }
@@ -125,25 +131,25 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
   }
 
 //  页面切换
-//  上一页
+//  下一页
   void nextPage() {
     if (totalPages > 0) {
       final goalPage = currentPage < totalPages ? currentPage + 1 : 1;
       _controller.goToPage(pageNumber: goalPage);
       if (!(currentPage < totalPages)) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('已到达最后一页，已返回第一页')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.navigationAtLastPage)),
         );
       }
     }
   }
-  // 下一页
+  // 上一页
   void previousPage() {
     final goalPage = currentPage > 1 ? currentPage - 1 : totalPages;
     _controller.goToPage(pageNumber: goalPage);
     if (!(currentPage > 1)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('已是第一页，已跳转到最后一页'))
+        SnackBar(content: Text(AppLocalizations.of(context)!.navigationAtFirstPage))
       );
     }
   }
@@ -181,7 +187,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
     _controller.removeListener(() {});
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setPreferredOrientations([]);
-    windowManager.setTitle("轻阅屏");
+    windowManager.setTitle(appName);
     super.dispose();
   }
 
@@ -197,7 +203,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
     if (_isError) {
       return Scaffold(
         appBar: appBar,
-        body: Center(child: Text('发生错误：$_errorMessage'),),
+        body: Center(child: Text(AppLocalizations.of(context)!.somethingWentWrong(_errorMessage)),),
       );
     }
 
@@ -293,7 +299,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
           child: IconButton(
             icon: Icon(Icons.menu),
             onPressed: () {},
-            tooltip: '菜单',
+            tooltip: AppLocalizations.of(context)!.menuButton,
             iconSize: _toolButtonSize,
           ),
         ),
@@ -331,7 +337,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
                       MyIcons.pan,
                       color: _currentToolMode == ToolMode.pan ? Colors.blue : null),
                   onPressed: () => _switchToolMode(ToolMode.pan),
-                  tooltip: '平移模式',
+                  tooltip: AppLocalizations.of(context)!.panMode,
                   hoverColor: Colors.transparent,
                   iconSize: _toolButtonSize,
                 ),
@@ -348,7 +354,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
                   icon: Icon(Icons.edit,
                       color: _currentToolMode == ToolMode.annotation ? Colors.blue : null),
                   onPressed: () => _switchToolMode(ToolMode.annotation),
-                  tooltip: '注释模式',
+                  tooltip: AppLocalizations.of(context)!.annotationMode,
                   hoverColor: Colors.transparent,
                   iconSize: _toolButtonSize,
                 ),
@@ -366,7 +372,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
                       MyIcons.eraser,
                       color: _currentToolMode == ToolMode.eraser ? Colors.blue : null),
                   onPressed: () => _switchToolMode(ToolMode.eraser),
-                  tooltip: '橡皮擦模式',
+                  tooltip: AppLocalizations.of(context)!.eraserMode,
                   hoverColor: Colors.transparent,
                   iconSize: _toolButtonSize,
                 ),
@@ -375,7 +381,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
               IconButton(
                 icon: Icon(Icons.delete),
                 onPressed: () => clearAllAnnotations(),
-                tooltip: '清空',
+                tooltip: AppLocalizations.of(context)!.clearButton,
                 iconSize: _toolButtonSize,
               ),
             ],
@@ -400,28 +406,28 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
               IconButton(
                 icon: Icon(Icons.fit_screen),
                 onPressed: () => resetZoom(),
-                tooltip: '自适应',
+                tooltip: AppLocalizations.of(context)!.fitToPageButton,
                 iconSize: _toolButtonSize,
               ),
               IconButton(
                 icon: Icon(Icons.zoom_in),
                 onPressed: () => zoomIn(),
-                tooltip: '放大',
+                tooltip: AppLocalizations.of(context)!.zoomInButton,
                 iconSize: _toolButtonSize,
               ),
               IconButton(
                 icon: Icon(Icons.zoom_out),
                 onPressed: () => zoomOut(),
-                tooltip: '缩小',
+                tooltip: AppLocalizations.of(context)!.zoomOutButton,
                 iconSize: _toolButtonSize,
               ),
               IconButton(
                 icon: Icon(Icons.settings),
-                tooltip: '设置',
+                tooltip: AppLocalizations.of(context)!.settingsButton,
                 iconSize: _toolButtonSize,
                 onPressed: () {
                   void Function(void Function()) mainSetState = setState;
-                  double? currentSize = _toolButtonSize; // 拷贝值
+                  double currentSize = _toolButtonSize; // 拷贝值
                   double strokeWidth = _strokeWidth;
                   Color currentPenColor = _currentPenColor;
 
@@ -435,7 +441,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               _settingsItem(
-                                '缩放：${currentSize?.round()}',
+                                AppLocalizations.of(context)!.buttonScale(currentSize.round().toString()),
                                 Slider(
                                   value: currentSize ?? 32,
                                   min: 16,
@@ -454,7 +460,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
                                 )
                               ),
                               _settingsItem(
-                                '画笔粗细：${strokeWidth.round()}',
+                                AppLocalizations.of(context)!.strokeWidth(strokeWidth.round().toString()),
                                 Slider(
                                   value: strokeWidth,
                                   min: 1,
@@ -473,7 +479,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
                                 )
                               ),
                               _settingsItem(
-                                '画笔颜色',
+                                AppLocalizations.of(context)!.brushColor,
                                 FilledButton(
                                   style: FilledButton.styleFrom(
                                     backgroundColor: currentPenColor,
@@ -484,7 +490,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
                                       context: context,
                                       builder: (context) {
                                         return AlertDialog(
-                                          title: Text('选择画笔颜色'),
+                                          title: Text(AppLocalizations.of(context)!.selectBrushColorTitle),
                                           content: SingleChildScrollView(
                                             child: ColorPicker(
                                               pickerColor: currentPenColor,
@@ -498,7 +504,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
                                           ),
                                           actions: [
                                             TextButton(
-                                              child: Text('确定'),
+                                              child: Text(AppLocalizations.of(context)!.ok),
                                               onPressed: () {
                                                 Navigator.of(context).pop();
                                                 // bottomSetState(() => currentPenColor = currentPenColor);
@@ -543,11 +549,11 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
               IconButton(
                 icon: Icon(Icons.arrow_back),
                 onPressed: () => previousPage(),
-                tooltip: '上一页',
+                tooltip: AppLocalizations.of(context)!.previousPageButton,
                 iconSize: _toolButtonSize,
               ),
               Text(
-                '页数',
+                AppLocalizations.of(context)!.page,
                 style: TextStyle(
                   // fontSize: _toolButtonSize / 2,
                   fontSize: _toolButtonSize * 0.5,
@@ -568,7 +574,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
               IconButton(
                 icon: Icon(Icons.arrow_forward),
                 onPressed: () => nextPage(),
-                tooltip: '下一页',
+                tooltip: AppLocalizations.of(context)!.nextPageButton,
                 iconSize: _toolButtonSize,
               ),
             ],
@@ -646,16 +652,16 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("跳转到页码"),
+          title: Text(AppLocalizations.of(context)!.goToPageTitle),
           content: TextField(
             controller: controller,
-            decoration: InputDecoration(hintText: "输入页数"),
+            decoration: InputDecoration(hintText: AppLocalizations.of(context)!.goToPageInputTip),
             autofocus: true, // 自动聚焦，弹出键盘
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(), // 取消
-              child: Text("取消"),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             TextButton(
                 onPressed: () {
@@ -669,12 +675,12 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
                         context: context,
                         builder: (BuildContext secondContext) {
                           return AlertDialog(
-                            title: Text("提示"),
-                            content: Text("请输入有效的页码"),
+                            title: Text(AppLocalizations.of(context)!.tip),
+                            content: Text(AppLocalizations.of(context)!.goToPageInputError),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.of(secondContext).pop(),
-                                child: Text("确定"),
+                                child: Text(AppLocalizations.of(context)!.ok),
                               )
                             ],
                           );
@@ -682,7 +688,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
                     );
                   }
                 },
-                child: Text("确定"),
+                child: Text(AppLocalizations.of(context)!.ok),
             )
           ],
         );
