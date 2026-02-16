@@ -32,6 +32,9 @@ lib/
 ├── main.dart                    # 应用入口
 ├── icons/
 │   └── my_icons.dart            # 自定义图标
+├── l10n/
+│   └── app_zh.arb               # 中文语言包，源语言
+|   └── app_en.arb               # 英文语言包，翻译参照下文贡献指南
 ├── screens/
 │   ├── pdf_list_screen.dart     # PDF 文件列表
 │   └── pdf_view_page.dart       # PDF 阅读界面
@@ -73,7 +76,7 @@ flutter run -d android
 
 ```bash
 # Windows
-flutter build windows
+flutter build windows --release
 
 # Android
 flutter build apk --release
@@ -81,12 +84,13 @@ flutter build apk --release
 
 ## 依赖配置
 
-主要依赖项 (查看 `pubspec.yaml` 完整列表):
+主要依赖项 (查看 [pubspec.yaml](pubspec.yaml) 完整列表):
 
 - **Flutter SDK** - 跨平台 UI 框架
 - **file_selector** - 文件选择
 - **path_provider** - 路径获取
-- **shared_preferences** - 轻量数据存储
+- **hive** - 轻量数据存储
+- **flutter_localizations** - 国际化支持
 
 ## 界面特性
 
@@ -98,7 +102,7 @@ flutter build apk --release
 
 ### 代码规范
 
-遵循 `analysis_options.yaml` 中的 Flutter 代码规范。
+遵循 [analysis_options.yaml](analysis_options.yaml) 中的 Flutter 代码规范。
 
 ### 平台配置
 
@@ -111,7 +115,8 @@ flutter build apk --release
 
 ## 贡献指南
 
-欢迎提交 Issue 和 Pull Request 来改进项目。
+- 欢迎提交 Issue 和 Pull Request 来改进项目。
+- 欢迎在 Crowdin 上进行翻译，项目地址：https://crowdin.com/project/liteview/invite?h=c7c4a127f0073e43072e56171619aeea2689186
 
 ## 联系方式
 
