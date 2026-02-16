@@ -234,11 +234,16 @@ class _PdfListScreenState extends State<PdfListScreen> {
                           AppLocalizations.of(context)!.modificationTime(_formatDate(modified)),
                           style: const TextStyle(fontSize: 12, color: Colors.grey),
                         ),
-                        const SizedBox(width: 16),
-                        Text(
-                          AppLocalizations.of(context)!.filePath(file.path),
-                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            AppLocalizations.of(context)!.filePath(file.path),
+                            style: const TextStyle(fontSize: 12, color: Colors.grey),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         )
+
                       ],
                     ),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 16),
