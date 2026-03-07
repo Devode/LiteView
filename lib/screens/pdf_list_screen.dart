@@ -69,6 +69,10 @@ class _PdfListScreenState extends State<PdfListScreen> {
     Map<String, dynamic>? updateInfo = await updateService.checkForUpdates();
     if (updateInfo != null && updateInfo['hasUpdate'] == true) {
       updateService.showUpdateDialog(context, updateInfo);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('当前已是最新版本'))
+      );
     }
   }
 
