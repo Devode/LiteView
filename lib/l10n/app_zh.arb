@@ -2,9 +2,16 @@
   "appTitle": "轻阅屏",
   "appName": "轻阅屏",
   "about": "关于",
+  "checkForUpdates": "检查更新",
 
   "legaleseLicense": "本软件为开源软件，采用 MIT 许可证。",
   "description": "一个轻量、离线、无广告的 PDF 阅读器。",
+  "githubRepositoryLink": "Github 仓库",
+  "giteeRepositoryLink": "Gitee 仓库",
+
+  "newVersionAvailable": "发现新版本",
+  "updateNote": "更新内容：",
+
 
   "removePdfTitle": "移除 PDF 文件",
   "removePdfPrompt": "选择要移除的 PDF 文件",
@@ -36,7 +43,6 @@
   "removePDF": "移除 PDF 文件",
 
   "pdfReader": "PDF 阅读器",
-  "menuButton": "菜单",
   "panMode": "平移模式",
   "annotationMode": "批注模式",
   "eraserMode": "橡皮擦模式",
@@ -48,6 +54,12 @@
   "previousPageButton": "上一页",
   "page": "页数",
   "nextPageButton": "下一页",
+
+
+  "menuButton": "菜单",
+  "exitFullScreen": "退出全屏",
+  "enterFullScreen": "全屏",
+  "exit": "退出",
 
   "buttonScale": "按钮缩放：{Scale}",
   "@buttonScale": {
@@ -101,5 +113,7 @@
   "remove": "移除",
   "ok": "确定",
   "error": "错误",
-  "more": "更多"
+  "more": "更多",
+  "viewDetails": "查看详情",
+  "downloadNow": "立即下载"
 }

@@ -1,14 +1,27 @@
+/// 导入 Flutter Material Design 组件库
 import 'package:flutter/material.dart';
+/// 导入 Dart I/O 库，用于文件系统操作
 import 'dart:io';
+/// 导入文件选择器库，用于让用户选择文件
 import 'package:file_picker/file_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
+/// 导入窗口管理器库，用于桌面窗口管理
 import 'package:window_manager/window_manager.dart';
 // import '../utils/pdf_file_scanner.dart';
+import '../services/update_service.dart';
+/// 导入 PDF 文件列表处理工具
 import '../utils/pdf_file_list_handler.dart';
+/// 导入 PDF 导入功能
 import '../utils/import_pdf.dart';
+/// 导入 JSON 文件处理器
 import 'package:lite_view/utils/json_file_handler.dart';
+/// 导入 PDF 查看页面
 import 'pdf_view_page.dart';
+/// 导入应用本地化支持
 import 'package:lite_view/l10n/app_localizations.dart';
 
+/// PDF 列表页面组件
+/// 显示已导入的 PDF 文件列表，支持导入和移除 PDF 文件
 class PdfListScreen extends StatefulWidget {
   const PdfListScreen({super.key});
 
@@ -16,31 +29,61 @@ class PdfListScreen extends StatefulWidget {
   State<PdfListScreen> createState() => _PdfListScreenState();
 }
 
+/// PDF 列表页面的状态管理类
+/// 负责 PDF 文件列表的加载、显示、导入和移除功能
 class _PdfListScreenState extends State<PdfListScreen> {
+  /// JSON 文件处理器实例，用于读写 PDF 文档信息
   final jsonHandler = JsonFileHandler();
-  
+
+  /// PDF 文件列表的 Future 对象，用于异步加载文件
   late Future<List<File>> _pdfFilesFuture;
+  /// PDF 文档信息映射，键为文件名，值为文件路径
   late Map<String, dynamic> _pdfDocs;
+  /// 删除窗口中选中的文件索引（可为 null 表示未选中）
   int? _selectedFileIndex; // 删除窗口选中选中文件的索引
+  /// PDF 文件列表
   List<File> pdfFiles = []; // PDF 文件列表
+  /// PDF 文件名列表
   List<String> pdfFileNames = []; // PDF 文件名列表
 
+  /// 初始化状态
+  /// 设置窗口标题并加载 PDF 文件列表
   @override
   void initState() {
     super.initState();
     // windowManager.setTitle("轻阅屏");
+    /// 加载 PDF 文件列表
     _loadPdfFiles();
+    /// 在第一帧绘制完成后设置窗口标题
     WidgetsBinding.instance.addPostFrameCallback((_) {
       windowManager.setTitle(AppLocalizations.of(context)!.appName);
     });
+
+    if (mounted) {
+      checkForUpdates();
+    }
   }
 
+  void checkForUpdates() async {
+    UpdateService updateService = UpdateService();
+    Map<String, dynamic>? updateInfo = await updateService.checkForUpdates();
+    if (updateInfo != null && updateInfo['hasUpdate'] == true) {
+      updateService.showUpdateDialog(context, updateInfo);
+    }
+  }
+
+  /// 加载 PDF 文件列表
+  /// 重新创建 Future 对象以触发列表刷新
   void _loadPdfFiles() {
     setState(() {
       _pdfFilesFuture = _getPdfFilesFuture();
     });
   }
 
+  /// 异步获取 PDF 文件列表
+  /// 从 Hive 数据库中读取 PDF 文档信息，并构建 File 对象列表
+  ///
+  /// 返回：PDF 文件列表
   Future<List<File>> _getPdfFilesFuture() async {
     _pdfDocs = await getPdfDocs(); // 获取 PDF 文档列表
     pdfFileNames = _pdfDocs.keys.toList(); // 获取 PDF 文件名列表
@@ -54,6 +97,15 @@ class _PdfListScreenState extends State<PdfListScreen> {
     return pdfFiles; // 返回 PDF 文件列表
   }
 
+  /// 选择并导入 PDF 文件
+  /// 使用文件选择器让用户选择 PDF 文件，然后将其添加到应用中
+  ///
+  /// 处理逻辑：
+  /// 1. 打开文件选择器（仅允许选择 PDF 文件）
+  /// 2. 检查文件是否已存在，避免重复导入
+  /// 3. 调用 importPdf 函数导入文件
+  /// 4. 导入成功后刷新列表
+  /// 5. 处理各种错误情况，包括 Linux 平台的文件选择器兼容性问题
   Future<void> _pickAndImportPdf() async {
     try {
       // 打开文件选择器（仅 PDF）
@@ -62,6 +114,7 @@ class _PdfListScreenState extends State<PdfListScreen> {
         allowedExtensions: ['pdf'],
       );
 
+      /// 用户取消选择文件
       if (result == null) {
         return;
       }
@@ -69,6 +122,7 @@ class _PdfListScreenState extends State<PdfListScreen> {
       // 导入文件
       File file = File(result.files.single.path!);
 
+      /// 检查文件是否已存在
       if (_pdfDocs.values.toList().contains(file.path)) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('文件已存在：${file.path.split('/').last}'),backgroundColor: Colors.red),
@@ -78,8 +132,10 @@ class _PdfListScreenState extends State<PdfListScreen> {
 
       try {
         // if (!mounted) return;
+        /// 导入 PDF 文件
         final importedFile = await importPdf(file.path);
         print(importedFile);
+        /// 导入成功，显示提示并刷新列表
         if (importedFile != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('已导入：${importedFile.path.split('/').last}')),
@@ -87,6 +143,7 @@ class _PdfListScreenState extends State<PdfListScreen> {
           _loadPdfFiles();
         }
       } catch (e) {
+        /// 导入失败，显示错误提示
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('导入失败：$e，文件路径：${file.path}'),backgroundColor: Colors.red),
         );
@@ -138,11 +195,20 @@ class _PdfListScreenState extends State<PdfListScreen> {
         }
       }
 
+      /// 显示文件选择器启动失败的错误提示
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('文件选择器启动失败：$e')),
       );
     }
 
+  }
+
+  Future<void> _launchUrl(String urlString) async {
+    final Uri url = Uri.parse(urlString);
+
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      throw Exception('无法打开 $url');
+    }
   }
   
   @override
@@ -165,12 +231,31 @@ class _PdfListScreenState extends State<PdfListScreen> {
                   applicationLegalese: 'Copyright © 2026. Devode.\n'
                       '${AppLocalizations.of(context)!.legaleseLicense}',
                   children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 8),
-                      child: Text(AppLocalizations.of(context)!.description),
+                    Text(
+                        AppLocalizations.of(context)!.description
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextButton(
+                          child: Text(AppLocalizations.of(context)!.githubRepositoryLink),
+                          onPressed: () {
+                            _launchUrl('https://github.com/Devode/LiteView');
+                          },
+                        ),
+                        TextButton(
+                          child: Text(AppLocalizations.of(context)!.giteeRepositoryLink),
+                          onPressed: () {
+                            _launchUrl('https://gitee.com/devode/lite_view');
+                          },
+                        )
+                      ],
                     )
                   ]
                 );
+              }
+              else if (result == 'checkForUpdate') {
+                checkForUpdates();
               }
             },
             itemBuilder: (BuildContext context) => [
@@ -184,13 +269,21 @@ class _PdfListScreenState extends State<PdfListScreen> {
                   ],
                 )
               ),
+              PopupMenuItem(
+                value: 'checkForUpdate',
+                child: Row(
+                  children: [
+                    const Icon(Icons.arrow_circle_up),
+                    const SizedBox(width: 8),
+                    Text(AppLocalizations.of(context)!.checkForUpdates),
+                  ],
+                ),
+              ),
             ],
           )
         ],
         elevation: 4,
         shadowColor: Colors.black,
-        // backgroundColor: Colors.pinkAccent,
-        // foregroundColor: Colors.white,
       ),
       body: FutureBuilder<List<File>>(
         future: _pdfFilesFuture,
@@ -213,7 +306,6 @@ class _PdfListScreenState extends State<PdfListScreen> {
               itemCount: pdfFiles.length,
               itemBuilder: (context, index) {
                 final file = pdfFiles[index];
-                // final fileName = file.path.split('/').last;
                 final fileName = pdfFileNames[index];
                 final modified = file.lastModifiedSync();
 
@@ -267,11 +359,13 @@ class _PdfListScreenState extends State<PdfListScreen> {
         spacing: 8,
         children: [
           FloatingActionButton(
+            heroTag: 'import_pdf',
             tooltip: AppLocalizations.of(context)!.importPDF,
             onPressed: _pickAndImportPdf,
             child: const Icon(Icons.upload_file),
           ),
           FloatingActionButton(
+            heroTag: 'remove_pdf',
             tooltip: AppLocalizations.of(context)!.removePDF,
             onPressed: _showDeleteWindow,
             child: Icon(Icons.playlist_remove),
@@ -282,10 +376,25 @@ class _PdfListScreenState extends State<PdfListScreen> {
     // FloatingActionButton
   }
 
+  /// 格式化日期时间为字符串
+  /// 将 DateTime 对象格式化为 "YYYY-MM-DD HH:mm" 格式
+  ///
+  /// 参数：
+  /// - [date] 要格式化的日期时间对象
+  ///
+  /// 返回：格式化后的日期时间字符串
   String _formatDate(DateTime date) {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')} ' '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, "0")}';
   }
 
+  /// 显示删除文件对话框
+  /// 弹出一个对话框，让用户选择要移除的 PDF 文件
+  ///
+  /// 功能：
+  /// 1. 显示所有 PDF 文件列表
+  /// 2. 允许用户选择要移除的文件
+  /// 3. 确认后从列表中移除文件（不会删除实际文件）
+  /// 4. 刷新文件列表
   void _showDeleteWindow() {
     print(pdfFiles);
     showDialog(
@@ -398,22 +507,5 @@ class _PdfListScreenState extends State<PdfListScreen> {
       }
     });
 
-  }
-
-  void _showImportGuide(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('如何导入 PDF 文件？'),
-        content: const Text('请将 PDF 文件复制到以下目录：\n\n'
-          '[手机存储]/Android/data/com.devode.lit_view/files/Documents'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('知道了'),
-          ),
-        ],
-      ),
-    );
   }
 }

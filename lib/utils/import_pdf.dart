@@ -1,4 +1,7 @@
-// lib/utils/import_pdf.dart
+/// lib/utils/import_pdf.dart
+/// PDF 文件导入工具
+/// 负责将 PDF 文件导入到应用中，并管理文件名冲突
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path;
@@ -6,11 +9,27 @@ import 'package:path_provider/path_provider.dart';
 import 'package:hive/hive.dart';
 import 'package:lite_view/utils/json_file_handler.dart';
 
+/// 导入 PDF 文件
+/// 将指定路径的 PDF 文件添加到应用的文档列表中
+///
+/// 功能：
+/// 1. 从 Hive 数据库读取已有的 PDF 文档列表
+/// 2. 处理文件名冲突（如果文件名已存在，自动添加数字后缀）
+/// 3. 将新文档信息保存到数据库
+/// 4. 返回导入的文件对象
+///
+/// 参数：
+/// - [sourcePath] 源文件的完整路径
+///
+/// 返回：导入的 File 对象，如果导入失败则返回 null
 Future<File?> importPdf(String sourcePath) async {
+  /// 打开或创建 pdf_docs 数据库
   final box = await Hive.openBox('pdf_docs'); // 打开pdf_docs数据库
 
+  /// 从数据库获取 PDF 文档信息，如果不存在则创建空 Map
   final data = box.get('docs') ?? <String, dynamic>{}; // 获取pdf_docs数据库中的pdf文档信息
 
+  /// 确保 Map 的键为 String 类型（Hive 可能存储为 dynamic 类型）
   var pdfDocsMap = data;
   if (data is Map) {
     final Map<String, dynamic> result = {};
@@ -26,8 +45,10 @@ Future<File?> importPdf(String sourcePath) async {
     pdfDocsMap = result;
   }
 
+  /// 获取源文件名
   String fileName = path.basename(sourcePath);
 
+  /// 处理文件名冲突
   int fileNameCounter = 1;
   final nameWithoutExt = path.basenameWithoutExtension(fileName); // 获取文件名，不包含扩展名
   final ext = path.extension(fileName); // 获取文件扩展名

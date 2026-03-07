@@ -2,8 +2,13 @@
   "appTitle": "LiteView",
   "appName": "LiteView",
   "about": "About",
+  "checkForUpdates": "Check for Update",
   "legaleseLicense": "This software is open source and licensed under the MIT License.",
   "description": "A lite, offline and ad-free PDF reader.",
+  "githubRepositoryLink": "Github Repository",
+  "giteeRepositoryLink": "Gitee Repository",
+  "newVersionAvailable": "New Version Available",
+  "updateNote": "What's New:",
   "removePdfTitle": "Remove PDF",
   "removePdfPrompt": "Select a PDF file to remove",
   "removePdfNote": "(Only removed from the list, not deleted from your device.)",
@@ -31,7 +36,6 @@
   "importPDF": "Import PDF",
   "removePDF": "Remove PDF",
   "pdfReader": "PDF Reader",
-  "menuButton": "Menu",
   "panMode": "Pan Mode",
   "annotationMode": "Annotation Mode",
   "eraserMode": "Eraser Mode",
@@ -43,6 +47,10 @@
   "previousPageButton": "Previous Page",
   "page": "Page",
   "nextPageButton": "Next Page",
+  "menuButton": "Menu",
+  "exitFullScreen": "Exit Fullscreen",
+  "enterFullScreen": "Fullscreen",
+  "exit": "Exit",
   "buttonScale": "Button Scale: {Scale}",
   "@buttonScale": {
     "description": "按钮缩放",
@@ -91,5 +99,7 @@
   "remove": "Remove",
   "ok": "OK",
   "error": "Error",
-  "more": "More"
+  "more": "More",
+  "viewDetails": "View Details",
+  "downloadNow": "Download Now"
 }

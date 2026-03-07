@@ -18,11 +18,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get about => 'About';
 
   @override
+  String get checkForUpdates => 'Check for Update';
+
+  @override
   String get legaleseLicense =>
       'This software is open source and licensed under the MIT License.';
 
   @override
   String get description => 'A lite, offline and ad-free PDF reader.';
+
+  @override
+  String get githubRepositoryLink => 'Github Repository';
+
+  @override
+  String get giteeRepositoryLink => 'Gitee Repository';
+
+  @override
+  String get newVersionAvailable => 'New Version Available';
+
+  @override
+  String get updateNote => 'What\'s New:';
 
   @override
   String get removePdfTitle => 'Remove PDF';
@@ -60,9 +75,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pdfReader => 'PDF Reader';
 
   @override
-  String get menuButton => 'Menu';
-
-  @override
   String get panMode => 'Pan Mode';
 
   @override
@@ -94,6 +106,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get nextPageButton => 'Next Page';
+
+  @override
+  String get menuButton => 'Menu';
+
+  @override
+  String get exitFullScreen => 'Exit Fullscreen';
+
+  @override
+  String get enterFullScreen => 'Fullscreen';
+
+  @override
+  String get exit => 'Exit';
 
   @override
   String buttonScale(String Scale) {
@@ -155,4 +179,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get more => 'More';
+
+  @override
+  String get viewDetails => 'View Details';
+
+  @override
+  String get downloadNow => 'Download Now';
 }

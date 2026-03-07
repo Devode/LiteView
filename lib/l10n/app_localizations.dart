@@ -116,6 +116,12 @@ abstract class AppLocalizations {
   /// **'关于'**
   String get about;
 
+  /// No description provided for @checkForUpdates.
+  ///
+  /// In zh, this message translates to:
+  /// **'检查更新'**
+  String get checkForUpdates;
+
   /// No description provided for @legaleseLicense.
   ///
   /// In zh, this message translates to:
@@ -127,6 +133,30 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'一个轻量、离线、无广告的 PDF 阅读器。'**
   String get description;
+
+  /// No description provided for @githubRepositoryLink.
+  ///
+  /// In zh, this message translates to:
+  /// **'Github 仓库'**
+  String get githubRepositoryLink;
+
+  /// No description provided for @giteeRepositoryLink.
+  ///
+  /// In zh, this message translates to:
+  /// **'Gitee 仓库'**
+  String get giteeRepositoryLink;
+
+  /// No description provided for @newVersionAvailable.
+  ///
+  /// In zh, this message translates to:
+  /// **'发现新版本'**
+  String get newVersionAvailable;
+
+  /// No description provided for @updateNote.
+  ///
+  /// In zh, this message translates to:
+  /// **'更新内容：'**
+  String get updateNote;
 
   /// No description provided for @removePdfTitle.
   ///
@@ -187,12 +217,6 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'PDF 阅读器'**
   String get pdfReader;
-
-  /// No description provided for @menuButton.
-  ///
-  /// In zh, this message translates to:
-  /// **'菜单'**
-  String get menuButton;
 
   /// No description provided for @panMode.
   ///
@@ -259,6 +283,30 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'下一页'**
   String get nextPageButton;
+
+  /// No description provided for @menuButton.
+  ///
+  /// In zh, this message translates to:
+  /// **'菜单'**
+  String get menuButton;
+
+  /// No description provided for @exitFullScreen.
+  ///
+  /// In zh, this message translates to:
+  /// **'退出全屏'**
+  String get exitFullScreen;
+
+  /// No description provided for @enterFullScreen.
+  ///
+  /// In zh, this message translates to:
+  /// **'全屏'**
+  String get enterFullScreen;
+
+  /// No description provided for @exit.
+  ///
+  /// In zh, this message translates to:
+  /// **'退出'**
+  String get exit;
 
   /// 按钮缩放
   ///
@@ -361,6 +409,18 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'更多'**
   String get more;
+
+  /// No description provided for @viewDetails.
+  ///
+  /// In zh, this message translates to:
+  /// **'查看详情'**
+  String get viewDetails;
+
+  /// No description provided for @downloadNow.
+  ///
+  /// In zh, this message translates to:
+  /// **'立即下载'**
+  String get downloadNow;
 }
 
 class _AppLocalizationsDelegate
