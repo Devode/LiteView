@@ -18,10 +18,25 @@ class AppLocalizationsZh extends AppLocalizations {
   String get about => '关于';
 
   @override
+  String get checkForUpdates => '检查更新';
+
+  @override
   String get legaleseLicense => '本软件为开源软件，采用 MIT 许可证。';
 
   @override
   String get description => '一个轻量、离线、无广告的 PDF 阅读器。';
+
+  @override
+  String get githubRepositoryLink => 'Github 仓库';
+
+  @override
+  String get giteeRepositoryLink => 'Gitee 仓库';
+
+  @override
+  String get newVersionAvailable => '发现新版本';
+
+  @override
+  String get updateNote => '更新内容：';
 
   @override
   String get removePdfTitle => '移除 PDF 文件';
@@ -58,9 +73,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pdfReader => 'PDF 阅读器';
 
   @override
-  String get menuButton => '菜单';
-
-  @override
   String get panMode => '平移模式';
 
   @override
@@ -92,6 +104,18 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get nextPageButton => '下一页';
+
+  @override
+  String get menuButton => '菜单';
+
+  @override
+  String get exitFullScreen => '退出全屏';
+
+  @override
+  String get enterFullScreen => '全屏';
+
+  @override
+  String get exit => '退出';
 
   @override
   String buttonScale(String Scale) {
@@ -151,4 +175,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get more => '更多';
+
+  @override
+  String get viewDetails => '查看详情';
+
+  @override
+  String get downloadNow => '立即下载';
 }

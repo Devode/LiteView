@@ -20,6 +20,11 @@
 - **PDF 查看页面** (`lib/screens/pdf_view_page.dart`) - 核心阅读界面
 - **绘制标注** (`lib/utils/pdf_aware_drawing_painter.dart`, `lib/widgets/current_path_painter.dart`) - 支持手绘标注和批注
 - **路径绘制** - 记录和显示用户绘制的标注路径
+- **路径优化** (`lib/utils/math_models.dart`) - 笔迹平滑处理（Douglas-Peucker 算法 + 二次贝塞尔曲线）
+
+### 应用服务
+- **自动更新检查** (`lib/services/update_service.dart`) - 从 Gitee 仓库自动检测新版本并提示用户更新
+- **版本管理** - 支持跨平台版本检测（Windows .exe / Android .apk）
 
 ### 数据持久化
 - **JSON 文件处理** (`lib/utils/json_file_handler.dart`) - 保存导入的 PDF 文档列表
@@ -39,12 +44,15 @@ lib/
 ├── screens/
 │   ├── pdf_list_screen.dart     # PDF 文件列表
 │   └── pdf_view_page.dart       # PDF 阅读界面
+├── services/
+│   └── update_service.dart      # 应用更新服务
 ├── utils/
 │   ├── import_pdf.dart          # PDF 导入工具
 │   ├── json_file_handler.dart   # JSON 数据处理
 │   ├── pdf_aware_drawing_painter.dart  # 标注绘制
 │   ├── pdf_file_scanner.dart    # PDF 文件扫描
-│   └── pdf_file_list_handler.dart      # PDF 文件列表处理
+│   ├── pdf_file_list_handler.dart      # PDF 文件列表处理
+│   └── math_models.dart         # 数学模型工具（路径优化）
 └── widgets/
     └── current_path_painter.dart # 路径绘制组件
 ```
@@ -89,10 +97,18 @@ flutter build apk --release
 主要依赖项 (查看 [pubspec.yaml](pubspec.yaml) 完整列表):
 
 - **Flutter SDK** - 跨平台 UI 框架
-- **file_selector** - 文件选择
+- **file_picker** - 文件选择器
 - **path_provider** - 路径获取
+- **pdfrx** - PDF 渲染引擎
+- **flutter_colorpicker** - 颜色选择器
 - **hive** - 轻量数据存储
-- **flutter_localizations** - 国际化支持
+- **flutter_localizations** - Flutter 国际化支持
+- **flutter_localization** - 自定义国际化方案
+- **window_manager** - 窗口管理（Windows）
+- **url_launcher** - 外部链接打开
+- **http** - HTTP 请求（更新检查）
+- **pub_semver** - 语义化版本管理
+- **package_info_plus** - 应用信息获取
 
 ## 界面特性
 
