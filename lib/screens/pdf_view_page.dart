@@ -387,6 +387,13 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
           ),
           // 菜单按钮
           child: PopupMenuButton(
+            icon: Icon(Icons.menu),
+            iconSize: _toolButtonSize,
+            tooltip: AppLocalizations.of(context)!.menuButton,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: Colors.grey.shade300, width: 0.5),
+            ),
             itemBuilder: (context) {
               return [
                 // 退出全屏
@@ -421,9 +428,6 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
 
               ];
             },
-            icon: Icon(Icons.menu),
-            iconSize: _toolButtonSize,
-            tooltip: AppLocalizations.of(context)!.menuButton,
           )
         ),
         // ElevatedButton.icon(

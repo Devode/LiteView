@@ -60,16 +60,16 @@ class _PdfListScreenState extends State<PdfListScreen> {
     });
 
     if (mounted) {
-      checkForUpdates();
+      checkForUpdates(isAppLaunching: true);
     }
   }
 
-  void checkForUpdates() async {
+  void checkForUpdates({bool isAppLaunching = false}) async {
     UpdateService updateService = UpdateService();
     Map<String, dynamic>? updateInfo = await updateService.checkForUpdates();
     if (updateInfo != null && updateInfo['hasUpdate'] == true) {
       updateService.showUpdateDialog(context, updateInfo);
-    } else {
+    } else if (!isAppLaunching) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('当前已是最新版本'))
       );
@@ -224,6 +224,10 @@ class _PdfListScreenState extends State<PdfListScreen> {
           PopupMenuButton(
             icon: const Icon(Icons.more_vert),
             tooltip: AppLocalizations.of(context)!.more,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: Colors.grey.shade300, width: 0.5),
+            ),
             onSelected: (String result) {
               // 处理选中项
               if (result == 'about') {
