@@ -4,12 +4,14 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lite_view/l10n/app_localizations.dart';
+import 'package:lite_view/services/download_service.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:http/http.dart' as http;
 import 'package:pub_semver/pub_semver.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class UpdateService {
+  final DownloadService downloadService = DownloadService();
   final String owner = 'devode';
   final String repo = 'lite_view';
 
@@ -105,6 +107,12 @@ class UpdateService {
             onPressed: () async {
               Navigator.of(ctx).pop();
               final Uri url = Uri.parse(updateInfo['url']);
+              if (updateInfo['isDirectAppPackage']) {
+                downloadService.startDownload(context, url.toString(), 'lite_view_installer');
+                if (Platform.isAndroid) {
+
+                }
+              }
               if (await canLaunchUrl(url)) {
                 await launchUrl(url, mode: LaunchMode.externalApplication);
               }
