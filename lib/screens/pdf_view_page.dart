@@ -1,33 +1,16 @@
-/// 导入 Dart 异步编程支持
-import 'dart:async';
-/// 导入 Dart UI 库，用于颜色、偏移量等类型
-import 'dart:ui';
-/// 导入 Dart I/O 库，用于文件系统操作
-import 'dart:io';
-
-/// 导入 Flutter Material Design 组件库
-import 'package:flutter/material.dart';
-/// 导入 Flutter 服务库，用于系统服务调用
-import 'package:flutter/services.dart';
-/// 导入颜色选择器库，用于选择画笔颜色
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-/// 导入应用本地化支持
-import 'package:lite_view/l10n/app_localizations.dart';
-/// 导入 PDF 阅读器库
-import 'package:pdfrx/pdfrx.dart';
-/// 导入自定义图标
-import 'package:lite_view/icons/my_icons.dart';
-/// 导入窗口管理器库
-import 'package:window_manager/window_manager.dart';
-
-/// 导入数据类型定义
-import 'package:lite_view/data_types/data_types.dart';
-/// 导入 PDF 绘制工具
-import 'package:lite_view/utils/pdf_aware_drawing_painter.dart';
-/// 导入当前路径绘制组件
-import 'package:lite_view/widgets/current_path_painter.dart';
-/// 导入数学模型
-import 'package:lite_view/utils/math_models.dart';
+import 'dart:async'; // 导入 Dart 异步编程支持
+import 'dart:io'; // 导入 Dart I/O 库，用于文件系统操作
+import 'package:flutter/material.dart'; // 导入 Flutter Material Design 组件库
+import 'package:flutter/services.dart'; // 导入 Flutter 服务库，用于系统服务调用
+import 'package:flutter_colorpicker/flutter_colorpicker.dart'; // 导入颜色选择器库，用于选择画笔颜色
+import 'package:lite_view/l10n/app_localizations.dart'; // 导入应用本地化支持
+import 'package:pdfrx/pdfrx.dart'; // 导入 PDF 阅读器库
+import 'package:lite_view/icons/my_icons.dart'; // 导入自定义图标
+import 'package:window_manager/window_manager.dart'; // 导入窗口管理器库
+import 'package:lite_view/data_types/data_types.dart'; // 导入数据类型定义
+import 'package:lite_view/utils/pdf_aware_drawing_painter.dart'; // 导入 PDF 绘制工具
+import 'package:lite_view/widgets/current_path_painter.dart'; // 导入当前路径绘制组件
+import 'package:lite_view/utils/math_models.dart'; // 导入数学模型
 // import 'package:shared_preferences/shared_preferences.dart';
 
 /// 工具模式枚举
@@ -387,6 +370,13 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
           ),
           // 菜单按钮
           child: PopupMenuButton(
+            icon: Icon(Icons.menu),
+            iconSize: _toolButtonSize,
+            tooltip: AppLocalizations.of(context)!.menuButton,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: Colors.grey.shade300, width: 0.5),
+            ),
             itemBuilder: (context) {
               return [
                 // 退出全屏
@@ -421,9 +411,6 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
 
               ];
             },
-            icon: Icon(Icons.menu),
-            iconSize: _toolButtonSize,
-            tooltip: AppLocalizations.of(context)!.menuButton,
           )
         ),
         // ElevatedButton.icon(
@@ -566,7 +553,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
                               _settingsItem(
                                 AppLocalizations.of(context)!.buttonScale(currentSize.round().toString()),
                                 Slider(
-                                  value: currentSize ?? 32,
+                                  value: currentSize,
                                   min: 16,
                                   max: 64,
                                   onChanged: (value) {
@@ -713,10 +700,6 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
       pagePathsForPainter[page] = paths.map(_withScreenCache).toList();
     });
 
-    final currentPathForPainter = _currentPath == null
-      ? null
-      : _withScreenCache(_currentPath!);
-
     return Stack(
       children: [
         Positioned.fill(
@@ -737,14 +720,16 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
         ),
         if ([ToolMode.annotation, ToolMode.eraser].contains(_currentToolMode))
           Positioned.fill(
-            child: GestureDetector(
+            child: Listener(
               behavior: HitTestBehavior.translucent,
-              onPanStart: _onPanStart,
-              onPanUpdate: _onPanUpdate,
-              onPanEnd: _onPanEnd,
+              onPointerDown: _onPointerDown,
+              onPointerMove: _onPointerMove,
+              onPointerUp: _onPointerUp,
+              onPointerCancel: _onPointerCancel,
               child: CurrentPathPainter(
                 key: _currentPathPainterKey,
                 // currentPath: _currentToolMode == ToolMode.annotation ? currentPathForPainter : null,
+                activePaths: _activePaths.values.toList(),
                 currentPage: currentPage.clamp(1, totalPages),
                 controller: _controller,
                 screenSize: MediaQuery.of(context).size,
@@ -822,9 +807,11 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
   }
 
   /// 当前正在绘制的路径
-  DrawingPath? _currentPath;
+  // DrawingPath? _currentPath;
+  final Map<int, DrawingPath> _activePaths = {};
   /// 当前绘制路径所在的页码
-  int? _currentPageForDrawing;
+  // int? _currentPageForDrawing;
+  final Map<int, int> _activePagePointers = {};
 
   /// 屏幕坐标转换为 PDF 坐标
   /// 将屏幕上的触摸位置转换为 PDF 文档坐标系中的位置
@@ -846,32 +833,35 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
   /// - 根据当前模式开始绘制或擦除
   ///
   /// 参数：
-  /// - [details] 拖动开始详情
-  void _onPanStart(DragStartDetails details) {
+  /// - [event] 拖动开始事件
+  void _onPointerDown(PointerDownEvent event) {
     // 仅在注释模式和橡皮擦模式下处理
     if (![ToolMode.annotation, ToolMode.eraser].contains(_currentToolMode)) return;
 
-    final pdfPoint = _screenToPdf(details.globalPosition); // 转换为PDF坐标
+    final pdfPoint = _screenToPdf(event.position); // 转换为PDF坐标
     if (pdfPoint == null) return; // 屏幕坐标转换失败，则忽略
+
+    final pointerId = event.pointer;
+    final currentPageNum = _controller.pageNumber;
 
     if (_currentToolMode == ToolMode.annotation) {
       /// 注释模式：开始新的绘制路径
       final screenPoint = _controller.documentToLocal(pdfPoint);
-      _currentPageForDrawing = _controller.pageNumber;
-      _currentPath = DrawingPath(
+      _activePaths[pointerId] = DrawingPath(
         points: [pdfPoint],
         color: _currentPenColor,
         strokeWidth: _strokeWidth,
         cachedScreenPoints: [screenPoint]
       );
+      _activePagePointers[pointerId] = currentPageNum ?? 1;
     } else if (_currentToolMode == ToolMode.eraser) {
       /// 橡皮擦模式：执行擦除操作
-      _currentPageForDrawing = _controller.pageNumber;
-      eraseStroke(pdfPoint);
+      _activePagePointers[pointerId] = currentPageNum ?? 1;
+      eraseStroke(pdfPoint, currentPageNum ?? 1);
     }
 
     /// 更新当前路径绘制器
-    _currentPathPainterKey.currentState?.updatePath(_currentPath);
+    _currentPathPainterKey.currentState?.updatePath(_activePaths.values.toList());
   }
 
   /// 手势更新回调
@@ -883,34 +873,39 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
   /// - 更新屏幕缓存的坐标点以优化性能
   ///
   /// 参数：
-  /// - [details] 拖动更新详情
-  void _onPanUpdate(DragUpdateDetails details) {
+  /// - [event] 拖动更新事件
+  void _onPointerMove(PointerMoveEvent event) {
+    final pointerId = event.pointer;
     // 在为注释模式时_currentPath为null，或者_currentPageForDrawing为null时忽略
-    if ((_currentPath == null && _currentToolMode == ToolMode.annotation) ||
-        _currentPageForDrawing == null) {
+    if (_currentToolMode == ToolMode.annotation &&
+        !_activePaths.containsKey(pointerId)) {
       return;
     }
 
-    final pdfPoint = _screenToPdf(details.globalPosition);
+    // 检查是否还在同一页（防止跨页绘制）
+    final startPage = _activePagePointers[pointerId];
+    if (startPage == null || _controller.pageNumber != startPage) {
+      return;
+    }
+
+    final pdfPoint = _screenToPdf(event.position);
     if (pdfPoint == null) return;
-    // 只在同一页面内绘制
-    if (_controller.pageNumber != _currentPageForDrawing) return;
 
     if (_currentToolMode == ToolMode.annotation) {
-      /// 注释模式：添加新的点到当前路径
-      final newScreenPoint = _controller.documentToLocal(pdfPoint);
-      final updatedPath = DrawingPath(
-        points: [..._currentPath!.points, pdfPoint],
-        color: _currentPath!.color,
-        strokeWidth: _currentPath!.strokeWidth,
-        cachedScreenPoints: [..._currentPath!.cachedScreenPoints!, newScreenPoint],
-      );
-
-      _currentPath = updatedPath;
-      _currentPathPainterKey.currentState?.updatePath(updatedPath);
+      final path = _activePaths[pointerId];
+      if (path != null) {
+        final newScreenPoint = _controller.documentToLocal(pdfPoint);
+        _activePaths[pointerId] = DrawingPath(
+          points: [...path.points, pdfPoint],
+          color: path.color,
+          strokeWidth: path.strokeWidth,
+          cachedScreenPoints: [...path.cachedScreenPoints!, newScreenPoint],
+        );
+      }
+      _currentPathPainterKey.currentState?.updatePath(_activePaths.values.toList());
     } else if (_currentToolMode == ToolMode.eraser) {
       /// 橡皮擦模式：继续擦除操作
-      eraseStroke(pdfPoint);
+      eraseStroke(pdfPoint, startPage);
     }
   }
 
@@ -923,22 +918,62 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
   /// - 触发 UI 更新
   ///
   /// 参数：
-  /// - [details] 拖动结束详情
-  void _onPanEnd(DragEndDetails details) {
-    if (_currentPath != null && _currentPageForDrawing != null) {
-      List<Offset> simplifiedPoints = MathModels.simplifyPolyline(_currentPath!.points, 0.5);
-      _currentPath = DrawingPath(
-        points: simplifiedPoints,
-        color: _currentPath!.color,
-        strokeWidth: _currentPath!.strokeWidth,
-        cachedScreenPoints: _currentPath!.cachedScreenPoints,
-      );
-      /// 将当前路径保存到对应页面的路径列表中
-      _pagePaths.putIfAbsent(_currentPageForDrawing!, () => []).add(_currentPath!);
+  /// - [event] 拖动结束事件
+  void _onPointerUp(PointerUpEvent event) {
+    final pointerId = event.pointer;
+    final startPage = _activePagePointers[pointerId];
 
-      _currentPathPainterKey.currentState?.updatePath(null);
-      _currentPath = null;
-      _currentPageForDrawing = null;
+    if (startPage != null && _activePaths.containsKey(pointerId)) {
+      final path = _activePaths[pointerId];
+      if (path != null) {
+        List<Offset> simplifiedPoints = MathModels.simplifyPolyline(path.points, 0.5);
+        final finalPath = DrawingPath(
+          points: simplifiedPoints,
+          color: path.color,
+          strokeWidth: path.strokeWidth,
+          cachedScreenPoints: path.cachedScreenPoints,
+        );
+        /// 将当前路径保存到对应页面的路径列表中
+        _pagePaths.putIfAbsent(startPage, () => []).add(finalPath);
+        // 更新当前路径绘制器
+        _currentPathPainterKey.currentState?.updatePath(null);
+        // 清空当前路径和页码引用
+        _activePaths.remove(pointerId);
+        _activePagePointers.remove(pointerId);
+
+      } else if (_currentToolMode == ToolMode.eraser) {
+        _activePagePointers.remove(pointerId);
+      }
+
+      setState(() {});
+    }
+  }
+
+  void _onPointerCancel(PointerCancelEvent event) {
+    final pointerId = event.pointer;
+    final startPage = _activePagePointers[pointerId];
+
+    if (startPage != null && _activePaths.containsKey(pointerId)) {
+      final path = _activePaths[pointerId];
+      if (path != null) {
+        List<Offset> simplifiedPoints = MathModels.simplifyPolyline(path.points, 0.5);
+        final finalPath = DrawingPath(
+          points: simplifiedPoints,
+          color: path.color,
+          strokeWidth: path.strokeWidth,
+          cachedScreenPoints: path.cachedScreenPoints,
+        );
+        /// 将当前路径保存到对应页面的路径列表中
+        _pagePaths.putIfAbsent(startPage, () => []).add(finalPath);
+        // 更新当前路径绘制器
+        _currentPathPainterKey.currentState?.updatePath(null);
+        // 清空当前路径和页码引用
+        _activePaths.remove(pointerId);
+        _activePagePointers.remove(pointerId);
+
+      } else if (_currentToolMode == ToolMode.eraser) {
+        _activePagePointers.remove(pointerId);
+      }
 
       setState(() {});
     }
@@ -954,14 +989,15 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
   ///
   /// 参数：
   /// - [pdfPoint] PDF 坐标系中的擦除点
-  void eraseStroke(Offset pdfPoint) {
-    if (_currentPageForDrawing == null) return;
+  /// - [currentPageNum] 当前页码
+  void eraseStroke(Offset pdfPoint, int currentPageNum) {
+    if (_activePagePointers.isEmpty) return;
 
     // 只处理当前页的路径
-    final currentPagePaths = _pagePaths[_currentPageForDrawing];
+    final currentPagePaths = _pagePaths[currentPageNum];
     if (currentPagePaths == null) return;
 
-    final double eraseRadius = 10.0; // 擦除半径
+    final double eraseRadius = _strokeWidth; //10.0; // 擦除半径
     currentPagePaths.removeWhere((drawingPath) {
       // 检查路径中的每个点是否在擦除点半径内
       for (Offset point in drawingPath.points) {
@@ -976,13 +1012,17 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
     setState(() {});
   }
 
+  void _triggerRebuild() {
+    if (mounted) setState(() {});
+  }
+
   /// 清空所有批注
   /// 删除所有页面的所有绘制路径
   void clearAllAnnotations() {
     _pagePaths.clear();
-    _currentPath = null;
+    _activePaths.clear();
+    _activePagePointers.clear();
 
-    _currentPathPainterKey.currentState?.updatePath(_currentPath);
-    setState(() {});
+    _triggerRebuild();
   }
 }

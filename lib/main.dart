@@ -1,22 +1,11 @@
-/// 导入 Flutter 核心库
-import 'package:flutter/material.dart';
-/// 导入 Hive 本地数据库库，用于数据持久化存储
-import 'package:hive/hive.dart';
-import 'package:lite_view/services/update_service.dart';
-/// 导入 path_provider 库，用于获取应用支持的目录路径
-import 'package:path_provider/path_provider.dart';
-/// 导入 window_manager 库，用于桌面窗口管理（Windows、Linux、macOS）
-import 'package:window_manager/window_manager.dart';
-/// 导入 Flutter 国际化支持
-import 'package:flutter_localizations/flutter_localizations.dart';
-/// 导入 Dart I/O 库，用于文件系统操作
-import 'dart:io';
-
-/// 导入 PDF 列表页面
-import 'package:lite_view/screens/pdf_list_screen.dart';
-/// 导入应用本地化配置
-import 'l10n/app_localizations.dart';
-import 'package:lite_view/services/update_service.dart';
+import 'package:flutter/material.dart';                            // 导入 Flutter 核心库
+import 'package:hive/hive.dart';                                   // 导入 Hive 本地数据库库，用于数据持久化存储
+import 'package:path_provider/path_provider.dart';                 // 导入 path_provider 库，用于获取应用支持的目录路径
+import 'package:window_manager/window_manager.dart';               // 导入 window_manager 库，用于桌面窗口管理（Windows、Linux、macOS）
+import 'package:flutter_localizations/flutter_localizations.dart'; // 导入 Flutter 国际化支持
+import 'dart:io';                                                  // 导入 Dart I/O 库，用于文件系统操作
+import 'package:lite_view/screens/pdf_list_screen.dart';           // 导入 PDF 列表页面
+import 'l10n/app_localizations.dart';                              // 导入应用本地化配置
 
 /// 应用程序入口函数
 /// 初始化 Flutter 绑定、配置应用数据存储路径、初始化 Hive 数据库，并启动应用
@@ -36,6 +25,7 @@ void main() async {
     print(path.path);
     /// 初始化窗口管理器（桌面平台需要）
     await windowManager.ensureInitialized();
+    windowManager.setMinimumSize(Size(350, 350));
   }
 
   /// 初始化 Hive 本地数据库，指定存储路径

@@ -33,3 +33,17 @@ class DrawingPath {
     this.cachedScreenPoints,
   });
 }
+
+class DownloadFile {
+  final String name;
+  final String url;
+  final bool isTemporary;
+  double progress;
+
+  DownloadFile({
+    required this.name,
+    required this.url,
+    required this.progress,
+    required this.isTemporary,
+  });
+}

@@ -1,15 +1,19 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:android_package_installer/android_package_installer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lite_view/l10n/app_localizations.dart';
+import 'package:lite_view/services/download_service.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class UpdateService {
+  final DownloadService downloadService = DownloadService();
   final String owner = 'devode';
   final String repo = 'lite_view';
 
@@ -105,7 +109,20 @@ class UpdateService {
             onPressed: () async {
               Navigator.of(ctx).pop();
               final Uri url = Uri.parse(updateInfo['url']);
-              if (await canLaunchUrl(url)) {
+              if (updateInfo['isDirectAppPackage']) {
+                final tempDir = await getTemporaryDirectory();
+                final savePath = Platform.isWindows ? '${tempDir.path}\\' :'${tempDir.path}/';
+
+                if (Platform.isAndroid) {
+                  await downloadService.startDownload(context, url.toString(), 'lite_view_installer.apk', isTemporary:  true);
+
+                  AndroidPackageInstaller.installApk(apkFilePath: '${savePath}lite_view_installer.apk');
+                } else if (Platform.isWindows) {
+                  await downloadService.startDownload(context, url.toString(), 'lite_view_installer.exe', isTemporary:  true);
+
+                  Process.start('${savePath}lite_view_installer.exe', []);
+                }
+              } else if (await canLaunchUrl(url)) {
                 await launchUrl(url, mode: LaunchMode.externalApplication);
               }
             },

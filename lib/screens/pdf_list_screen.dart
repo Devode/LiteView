@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 /// 导入文件选择器库，用于让用户选择文件
 import 'package:file_picker/file_picker.dart';
+import 'package:lite_view/data_types/data_types.dart';
 import 'package:url_launcher/url_launcher.dart';
 /// 导入窗口管理器库，用于桌面窗口管理
 import 'package:window_manager/window_manager.dart';
 // import '../utils/pdf_file_scanner.dart';
+import '../services/download_service.dart';
 import '../services/update_service.dart';
 /// 导入 PDF 文件列表处理工具
 import '../utils/pdf_file_list_handler.dart';
@@ -34,11 +36,20 @@ class PdfListScreen extends StatefulWidget {
 class _PdfListScreenState extends State<PdfListScreen> {
   /// JSON 文件处理器实例，用于读写 PDF 文档信息
   final jsonHandler = JsonFileHandler();
+  final downloadService = DownloadService();
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   /// PDF 文件列表的 Future 对象，用于异步加载文件
   late Future<List<File>> _pdfFilesFuture;
   /// PDF 文档信息映射，键为文件名，值为文件路径
   late Map<String, dynamic> _pdfDocs;
+
+  bool _isDownloading = false;
+  double _downloadProgress = 0.0;
+  List<DownloadFile> _downloadingFiles = [];
+
+
   /// 删除窗口中选中的文件索引（可为 null 表示未选中）
   int? _selectedFileIndex; // 删除窗口选中选中文件的索引
   /// PDF 文件列表
@@ -58,18 +69,29 @@ class _PdfListScreenState extends State<PdfListScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       windowManager.setTitle(AppLocalizations.of(context)!.appName);
     });
+    
+    downloadService.addListener(() {
+      setState(() {
+        _isDownloading = downloadService.isDownloading;
+        _downloadProgress = downloadService.progress;
+        _downloadingFiles = downloadService.downloadingFiles;
+      });
+    });
+    
+    // downloadService.startDownload(context, "https://gitee.com/devode/lite_view/releases/download/v1.0.0-beta.4/%E8%BD%BB%E9%98%85%E5%B1%8F_arm64.apk", "ss.apk", isTemporary:  true);
+    // downloadService.startDownload(context, "https://gitee.com/devode/lite_view/releases/download/v1.0.0-beta.4/%E8%BD%BB%E9%98%85%E5%B1%8F%E5%AE%89%E8%A3%85%E7%A8%8B%E5%BA%8F_win_x64.exe", "ss.exe");
 
     if (mounted) {
-      checkForUpdates();
+      checkForUpdates(isAppLaunching: true);
     }
   }
 
-  void checkForUpdates() async {
+  void checkForUpdates({bool isAppLaunching = false}) async {
     UpdateService updateService = UpdateService();
     Map<String, dynamic>? updateInfo = await updateService.checkForUpdates();
     if (updateInfo != null && updateInfo['hasUpdate'] == true) {
       updateService.showUpdateDialog(context, updateInfo);
-    } else {
+    } else if (!isAppLaunching) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('当前已是最新版本'))
       );
@@ -217,13 +239,19 @@ class _PdfListScreenState extends State<PdfListScreen> {
   
   @override
   Widget build(BuildContext context) {
+    final screeWidth = MediaQuery.of(context).size.width;
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.appTitle),
         actions: [
           PopupMenuButton(
             icon: const Icon(Icons.more_vert),
             tooltip: AppLocalizations.of(context)!.more,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: Colors.grey.shade300, width: 0.5),
+            ),
             onSelected: (String result) {
               // 处理选中项
               if (result == 'about') {
@@ -373,11 +401,80 @@ class _PdfListScreenState extends State<PdfListScreen> {
             tooltip: AppLocalizations.of(context)!.removePDF,
             onPressed: _showDeleteWindow,
             child: Icon(Icons.playlist_remove),
+          ),
+          FloatingActionButton(
+            heroTag: 'downloads',
+            onPressed: () {
+              _scaffoldKey.currentState?.openEndDrawer();
+              print("jjsj");
+            },
+            child: Stack(
+              children: [
+                Icon(Icons.download),
+                if (_isDownloading)
+                  Positioned.fill(
+                    bottom: 0,
+                    left: 0,
+                    child: CircularProgressIndicator(
+                      value: _calculateProgress(),
+                      backgroundColor: Colors.transparent,
+                    )
+                  )
+              ]
+            ),
           )
         ],
-      )
+      ),
+
+      endDrawer: Drawer(
+        width: (screeWidth * 0.4).clamp(300, screeWidth),
+        child: Column(
+          children: [
+            ListTile(
+              title: Text("下载"),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _downloadingFiles.length,
+                itemBuilder: (context, index) {
+                  final fileName = _downloadingFiles[index].name;
+                  final progress = _downloadingFiles[index].progress;
+                  return ListTile(
+                      title: Text(fileName),
+                      leading: Icon(Icons.file_download),
+                      subtitle: Row(
+                          children: [
+                            Expanded(
+                              child: LinearProgressIndicator(
+                                value: progress,
+                                backgroundColor: Colors.grey[200],
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Text("${(progress * 100).toStringAsFixed(2)}%")
+                          ]
+                      )
+                  );
+                },
+              ),
+            )
+
+          ]
+        ),
+      ),
     );
     // FloatingActionButton
+  }
+
+  double _calculateProgress() {
+    if (_downloadingFiles.isEmpty) {
+      return 0;
+    }
+    double totalProgress = 0;
+    for (var file in _downloadingFiles) {
+      totalProgress += file.progress;
+    }
+    return totalProgress / _downloadingFiles.length;
   }
 
   /// 格式化日期时间为字符串

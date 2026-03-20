@@ -18,7 +18,7 @@ class PdfAwareDrawingPainter extends CustomPainter {
   /// 所有页面的批注路径映射，键为页码，值为该页的所有绘制路径
   final Map<int, List<DrawingPath>> pagePaths;
   /// 当前正在绘制的路径（可选）
-  final DrawingPath? currentPath;
+  final List<DrawingPath>? currentPath;
   /// 当前页码（从 1 开始）
   final int currentPage; // 期望 >=1
   /// PDF 查看器控制器，用于获取缩放和位置信息
@@ -97,7 +97,9 @@ class PdfAwareDrawingPainter extends CustomPainter {
 
       /// 绘制当前正在绘制的路径
       if (currentPath != null) {
-        _drawPaths(canvas, [currentPath!], centerPos, zoom, paint, true);
+        for (final path in currentPath!) {
+          _drawPaths(canvas, [path], centerPos, zoom, paint, true);
+        }
       }
     } catch (e) {
       // 可选：开发时打印错误

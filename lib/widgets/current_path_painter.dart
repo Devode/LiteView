@@ -12,6 +12,7 @@ import 'package:lite_view/utils/pdf_aware_drawing_painter.dart';
 /// 与已保存的批注路径分离，以优化性能和用户体验
 class CurrentPathPainter extends StatefulWidget {
   // final DrawingPath? currentPath;
+  final List<DrawingPath>? activePaths;
   /// 当前页码（从 1 开始）
   final int currentPage;
   /// PDF 查看器控制器
@@ -28,10 +29,11 @@ class CurrentPathPainter extends StatefulWidget {
   /// - [screenSize] 屏幕尺寸
   const CurrentPathPainter({
     super.key,
+    this.activePaths,
     // this.currentPath,
     required this.currentPage,
     required this.controller,
-    required this.screenSize,
+    required this.screenSize
   });
 
   @override
@@ -43,7 +45,7 @@ class CurrentPathPainter extends StatefulWidget {
 class CurrentPathPainterState extends State<CurrentPathPainter> {
   /// 本地存储的当前绘制路径
   /// 使用本地状态而不是从外部传入，以便更灵活地控制重绘
-  DrawingPath? _localCurrentPath; // 自己的状态，只用于触发自身重绘
+  List<DrawingPath>? _localCurrentPath; // 自己的状态，只用于触发自身重绘
 
   // @override
   // void didUpdateWidget(covariant CurrentPathPainter oldWidget) {
@@ -59,7 +61,7 @@ class CurrentPathPainterState extends State<CurrentPathPainter> {
   ///
   /// 参数：
   /// - [newPath] 新的绘制路径，如果为 null 则清空当前路径
-  void updatePath(DrawingPath? newPath) {
+  void updatePath(List<DrawingPath>? newPath) {
     /// 确保组件仍然挂载
     if (mounted) {
       setState(() {
