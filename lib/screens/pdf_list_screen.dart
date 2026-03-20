@@ -78,8 +78,8 @@ class _PdfListScreenState extends State<PdfListScreen> {
       });
     });
     
-    downloadService.startDownload(context, "https://gitee.com/devode/lite_view/releases/download/v1.0.0-beta.4/%E8%BD%BB%E9%98%85%E5%B1%8F_arm64.apk", "ss.apk", isTemporary:  true);
-    downloadService.startDownload(context, "https://gitee.com/devode/lite_view/releases/download/v1.0.0-beta.4/%E8%BD%BB%E9%98%85%E5%B1%8F%E5%AE%89%E8%A3%85%E7%A8%8B%E5%BA%8F_win_x64.exe", "ss.exe");
+    // downloadService.startDownload(context, "https://gitee.com/devode/lite_view/releases/download/v1.0.0-beta.4/%E8%BD%BB%E9%98%85%E5%B1%8F_arm64.apk", "ss.apk", isTemporary:  true);
+    // downloadService.startDownload(context, "https://gitee.com/devode/lite_view/releases/download/v1.0.0-beta.4/%E8%BD%BB%E9%98%85%E5%B1%8F%E5%AE%89%E8%A3%85%E7%A8%8B%E5%BA%8F_win_x64.exe", "ss.exe");
 
     if (mounted) {
       checkForUpdates(isAppLaunching: true);

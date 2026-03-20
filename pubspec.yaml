@@ -51,6 +51,7 @@ dependencies:
   pub_semver: ^2.2.0
   package_info_plus: ^9.0.0
   dio: ^5.9.2
+  android_package_installer: ^0.0.3
 
 dev_dependencies:
   flutter_test:
